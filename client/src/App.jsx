@@ -8,7 +8,14 @@ function App() {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    getData(search);
+    getData();
+  }, []);
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      getData(search || "");
+    }, 500);
+    return () => clearTimeout(t);
   }, [search]);
 
   async function getData(input) {
@@ -33,7 +40,7 @@ function App() {
 
     // onClick
     if (typeof arg === "string") {
-      const arr = search.split(" ").filter(Boolean);
+      const arr = search.split(" ").filter(Boolean); //แยกข้อความด้วย " " และตัดช่องเวลาเกินข้างหลัง
       if (arr.includes(arg)) {
         setSearch(arr.filter((w) => w !== arg).join(" "));
       } else {
@@ -42,7 +49,6 @@ function App() {
       return;
     }
   }
-
 
   return (
     <div className="flex flex-col mx-auto md:w-[1200px]">
@@ -69,9 +75,22 @@ function App() {
                 <img src={item.photos[0]} alt={item.title} className="w-[350px] h-[240px] rounded-3xl object-cover shadow-2xs" />
               </div>
 
-              <div className="flex flex-col w-4/6">
-                <div className="text-2xl font-bold">{item.title}</div>
-                <div className="w-full my-2 line-clamp-3 md:line-clamp-1 md:overflow-hidden md:text-ellipsis">{item.description}</div>
+              <div className="flex relative flex-col w-4/6">
+                <div className="text-2xl font-bold">
+                  <a
+                    href={item.url}
+                    target="_blank"
+                    className="hover:underline"
+                  >
+                    {item.title}
+                  </a>
+                </div>
+
+                <div className="w-full my-2 text-[16px]">
+                  {/* array.slice(start, end); */}
+                  {item.description.length >= 100 ? item.description.slice(0, 100) + "..." : item.description}
+                </div>
+
                 <button
                   className="flex text-sky-600 underline cursor-pointer"
                   onClick={() => window.open(item.url, "_blank")}
@@ -97,6 +116,19 @@ function App() {
                     className="w-[80px] h-[80px] rounded-2xl object-cover shadow-2xs" />
                 ))}</div>
 
+                {/* onClick={() => { navigator.clipboard.writeText(this.state.textToCopy) }} */}
+                <button
+                  className="flex absolute right-5 bottom-5 text-sky-600 underline cursor-pointer"
+                  onClick={() => {
+                    navigator.clipboard.writeText(item.url);
+                    alert("คัดลอกลิงก์แล้ว: " + item.url);
+                  }}
+                >
+                  <img src="/icon/clipboard.png"
+                    alt="clipboard"
+                    className="w-[40px] h-[40px]"
+                  />
+                </button>
               </div>
             </div>
           </div>
